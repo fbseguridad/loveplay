@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LovePlay Online 💖</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(180deg, #ff4fa7, #6d2b91);
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      margin-top: 20px;
+      font-size: 2em;
+    }
+    input, button {
+      margin: 6px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+    input {
+      width: 80%;
+      max-width: 300px;
+    }
+    button {
+      background-color: #ff007a;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background-color: #e80070;
+    }
+    #feed {
+      margin-top: 20px;
+    }
+    video, img {
+      max-width: 90%;
+      border-radius: 16px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>💞 LovePlay Online 💞</h1>
+
+  <h3>Registro / Login</h3>
+  <input type="email" id="email" placeholder="Usuario (email)" />
+  <input type="password" id="password" placeholder="Contraseña" />
+  <br />
+  <button id="registrar">Registrar</button>
+  <button id="login">Login</button>
+
+  <h3>Subir foto/video</h3>
+  <input type="file" id="archivo" />
+  <button id="subir">Subir</button>
+
+  <h3>Feed tipo TikTok</h3>
+  <div id="feed"></div>
+
+  <h3>Pago prueba 💰</h3>
+  <button id="pago">Pagar $100</button>
+
+  <script type="module">
+    import {
+      registrarUsuario,
+      loginUsuario,
+      subirArchivo,
+      guardarPost,
+      obtenerPosts
+    } from "./firebase-init.js";
+
+    // Registrar usuario
+    document.getElementById("registrar").onclick = async () => {
+      const email = emailInput.value;
+      const password = passwordInput.value;
+      try {
+        await registrarUsuario(email, password);
+        alert("✅ Usuario registrado correctamente");
+      } catch (e) {
+        alert("❌ Error: " + e.message);
+      }
+    };
+
+    // Login usuario
+    document.getElementById("login").onclick = async () => {
+      const email = emailInput.value;
+      const password = passwordInput.value;
+      try {
+        await loginUsuario(email, password);
+        alert("✅ Login correcto");
+        cargarFeed();
+      } catch (e) {
+        alert("❌ Error: " + e.message);
+      }
+    };
+
+    // Subir archivo
+    document.getElementById("subir").onclick = async () => {
+      const file = document.getElementById("archivo").files[0];
+      if (!file) return alert("Selecciona un archivo primero");
+      try {
+        const url = await subirArchivo(file);
+        await guardarPost(document.getElementById("email").value, url);
+        alert("📤 Archivo subido correctamente");
+        cargarFeed();
+      } catch (e) {
+        alert("❌ Error al subir: " + e.message);
+      }
+    };
+
+    // Mostrar feed
+    async function cargarFeed() {
+      const posts = await obtenerPosts();
+      const feedDiv = document.getElementById("feed");
+      feedDiv.innerHTML = "";
+      posts.reverse().forEach(p => {
+        const ext = p.url.split(".").pop();
+        if (["mp4", "webm", "mov"].includes(ext)) {
+          feedDiv.innerHTML += `<video controls src="${p.url}"></video>`;
+        } else {
+          feedDiv.innerHTML += `<img src="${p.url}" />`;
+        }
+      });
+    }
+
+    // Botón de pago simulado (luego se integrará Mercado Pago real)
+    document.getElementById("pago").onclick = () => {
+      alert("💳 Prueba de pago: próximamente Mercado Pago real");
+    };
+  </script>
+</body>
+</html>

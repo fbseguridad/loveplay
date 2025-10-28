@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LovePlay Online</title>
+  <style>
+    body { font-family: Arial; background:#111; color:#fff; text-align:center; }
+    input, button { padding:10px; margin:5px; border:none; border-radius:8px; }
+    button { background:#ff4081; color:#fff; cursor:pointer; }
+    button:hover { background:#ff79a1; }
+    #feed img, #feed video { width:200px; margin:10px; border-radius:10px; }
+  </style>
+</head>
+<body>
+  <h1>💗 LovePlay Online</h1>
+
+  <h3>Registro / Login</h3>
+  <input id="email" type="email" placeholder="Email" /><br />
+  <input id="password" type="password" placeholder="Contraseña" /><br />
+  <button onclick="register()">Registrar</button>
+  <button onclick="login()">Login</button>
+
+  <hr />
+  <h3>Subir foto/video</h3>
+  <input type="file" id="file" /><br />
+  <button onclick="upload()">Subir</button>
+
+  <hr />
+  <h3>Feed tipo TikTok</h3>
+  <div id="feed"></div>
+
+  <script type="module" src="firebase-init.js"></script>
+</body>
+</html>

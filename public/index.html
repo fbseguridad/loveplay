@@ -2,92 +2,46 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>LovePlay</title>
-<style>
-body{font-family:sans-serif;text-align:center;margin:0;padding:0;}
-#feed{display:flex;flex-direction:column;gap:10px;max-width:400px;margin:auto;}
-video,img{max-width:100%;border-radius:8px;}
-</style>
+<title>LovePlay Online</title>
+<script type="module" src="firebase-init.js"></script>
 </head>
 <body>
 <h1>LovePlay Online</h1>
 
+<section>
 <h2>Registro / Login</h2>
-<input type="text" id="username" placeholder="Usuario">
-<select id="tipo">
-  <option value="usuario">Usuario</option>
-  <option value="creador">Creador</option>
-</select>
+<input id="email" placeholder="Email"><input id="pass" type="password" placeholder="Password">
 <button onclick="register()">Registrar</button>
 <button onclick="login()">Login</button>
+</section>
 
+<section>
 <h2>Subir foto/video</h2>
-<input type="file" id="file">
-<button onclick="upload()">Subir</button>
+<input type="file" id="fileInput">
+<button onclick="uploadFile()">Subir</button>
+</section>
 
+<section>
 <h2>Feed tipo TikTok</h2>
 <div id="feed"></div>
+</section>
 
+<section>
 <h2>Pago prueba $100</h2>
-<button onclick="pago()">Pagar</button>
+<button onclick="payTest()">Pagar</button>
+</section>
 
 <script>
-let currentUser=null;
-
-async function register(){
-  const username=document.getElementById('username').value;
-  const tipo=document.getElementById('tipo').value;
-  const r=await fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,tipo})});
-  const data=await r.json();
-  alert(JSON.stringify(data));
-}
-
-async function login(){
-  const username=document.getElementById('username').value;
-  const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username})});
-  const data=await r.json();
-  if(data.ok) currentUser=data.user;
-  alert(JSON.stringify(data));
-}
-
-async function upload(){
-  if(!currentUser){alert('Logueate primero'); return;}
-  const file=document.getElementById('file').files[0];
-  const form=new FormData();
-  form.append('file',file);
-  form.append('userId',currentUser.id);
-  const r=await fetch('/api/upload',{method:'POST',body:form});
-  const data=await r.json();
-  alert(JSON.stringify(data));
-  loadFeed();
-}
-
-async function loadFeed(){
-  const r=await fetch('/api/feed');
-  const data=await r.json();
-  const feed=document.getElementById('feed');
-  feed.innerHTML='';
-  data.feed.forEach(p=>{
-    if(p.url.endsWith('.mp4')){
-      const v=document.createElement('video');
-      v.src=p.url; v.controls=true;
-      feed.appendChild(v);
-    }else{
-      const img=document.createElement('img');
-      img.src=p.url;
-      feed.appendChild(img);
-    }
+async function payTest(){
+  const resp = await fetch('/api/pago-prueba', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({precio:100})
   });
-}
-
-async function pago(){
-  const r=await fetch('/api/pago-prueba',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({precio:100})});
-  const data=await r.json();
-  if(data.ok) window.location.href=data.init_point;
+  const data = await resp.json();
+  if(data.ok) window.open(data.init_point,'_blank');
   else alert(JSON.stringify(data));
 }
-
-loadFeed();
 </script>
 </body>
 </html>
