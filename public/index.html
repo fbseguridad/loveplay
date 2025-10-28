@@ -9,39 +9,71 @@
 <h1>LovePlay Online</h1>
 
 <section>
-<h2>Registro / Login</h2>
-<input id="email" placeholder="Email"><input id="pass" type="password" placeholder="Password">
-<button onclick="register()">Registrar</button>
-<button onclick="login()">Login</button>
+  <h2>Registro / Login</h2>
+  <input id="email" type="email" placeholder="Usuario">
+  <input id="pass" type="password" placeholder="Contraseña">
+  <button onclick="register()">Registrar</button>
+  <button onclick="login()">Login</button>
 </section>
 
 <section>
-<h2>Subir foto/video</h2>
-<input type="file" id="fileInput">
-<button onclick="uploadFile()">Subir</button>
+  <h2>Subir foto/video</h2>
+  <input type="file" id="fileInput">
+  <button onclick="uploadFile()">Subir</button>
 </section>
 
 <section>
-<h2>Feed tipo TikTok</h2>
-<div id="feed"></div>
+  <h2>Feed tipo TikTok</h2>
+  <div id="feed"></div>
 </section>
 
-<section>
-<h2>Pago prueba $100</h2>
-<button onclick="payTest()">Pagar</button>
-</section>
+<script type="module">
+import { auth, db, storage } from "./firebase-init.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js";
+import { collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore.js";
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-storage.js";
 
-<script>
-async function payTest(){
-  const resp = await fetch('/api/pago-prueba', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({precio:100})
-  });
-  const data = await resp.json();
-  if(data.ok) window.open(data.init_point,'_blank');
-  else alert(JSON.stringify(data));
+async function register() {
+  const email = document.getElementById('email').value;
+  const pass = document.getElementById('pass').value;
+  await createUserWithEmailAndPassword(auth, email, pass);
+  alert('Usuario registrado!');
 }
+
+async function login() {
+  const email = document.getElementById('email').value;
+  const pass = document.getElementById('pass').value;
+  await signInWithEmailAndPassword(auth, email, pass);
+  alert('Login exitoso!');
+}
+
+async function uploadFile() {
+  const file = document.getElementById('fileInput').files[0];
+  if (!file) return alert("Selecciona un archivo");
+  const storageRef = ref(storage, 'uploads/' + file.name);
+  await uploadBytes(storageRef, file);
+  const url = await getDownloadURL(storageRef);
+  await addDoc(collection(db, "posts"), { url, createdAt: new Date() });
+  alert('Archivo subido!');
+  loadFeed();
+}
+
+async function loadFeed() {
+  const feedDiv = document.getElementById('feed');
+  feedDiv.innerHTML = "";
+  const querySnapshot = await getDocs(collection(db, "posts"));
+  querySnapshot.forEach(doc => {
+    const video = document.createElement('video');
+    video.src = doc.data().url;
+    video.controls = true;
+    video.width = 300;
+    feedDiv.appendChild(video);
+    feedDiv.appendChild(document.createElement('hr'));
+  });
+}
+
+// Cargar feed al iniciar
+loadFeed();
 </script>
 </body>
 </html>
