@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>LovePlay</title>
+</head>
+<body>
+<h1>Bienvenido a LovePlay</h1>
+<button id="btnPago">Pagar prueba $100</button>
+
+<script>
+document.getElementById('btnPago').addEventListener('click', async () => {
+  const resp = await fetch('/api/pago-prueba', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ precio: 100 })
+  });
+  const data = await resp.json();
+  if(data.ok){
+    window.location.href = data.init_point;
+  } else {
+    alert('Error: '+JSON.stringify(data.error || data.detail));
+  }
+});
+</script>
+</body>
+</html>
