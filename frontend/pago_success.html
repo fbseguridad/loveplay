@@ -1,0 +1,16 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Pago OK</title></head>
+<body>
+<h2>Pago completado. Gracias :)</h2>
+<p>Si estás en pruebas, clic <button id="confirm">Confirmar venta (modo prueba)</button></p>
+<script>
+document.getElementById('confirm').addEventListener('click', async ()=>{
+  // En pruebas necesitas el ID de la venta (lo podés ver en data/ventas.json)
+  const ventaId = prompt('Pega el ventaId guardado en data/ventas.json (mode prueba):');
+  if(!ventaId) return alert('No id');
+  const resp = await fetch('/api/venta_confirmada',{method:'POST',headers:{'Content-Type':'application/json'},body: JSON.stringify({ventaId: Number(ventaId)})});
+  const j = await resp.json();
+  alert(JSON.stringify(j));
+});
+</script>
+</body></html>
